@@ -33,7 +33,7 @@ class Jarheads(Sprite):
 
 #pygame setup
 pygame.init()
-screen = pygame.display.set_mode((900, 700))
+screen = pygame.display.set_mode((700, 700))
 #sprite stuff
 toastysource = pygame.image.load("./assets/toastman.png").convert_alpha()
 jellysource = pygame.image.load("./assets/jellyjar.png").convert_alpha()
@@ -59,18 +59,26 @@ while main:
         if event.type == pygame.QUIT:
             main = False
     screen.fill(BICEBLUE)
+    #Controls
     keys = pygame.key.get_pressed()
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        player_pos.x -= velocity#Moves left
+        if player_pos.x > 0:
+            player_pos.x -= velocity#Moves left
     if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        player_pos.x += velocity#Moves right
+        if player_pos.x < 600:
+            player_pos.x += velocity#Moves right
     if keys[pygame.K_UP] or keys[pygame.K_w]:
-        player_pos.y -= velocity  #Moves up
+        if player_pos.y > 0:
+            player_pos.y -= velocity  #Moves up
     if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-        player_pos.y += velocity  #Moves down
+        if player_pos.y < 600:
+            player_pos.y += velocity  #Moves down
     screen.blit(toasty, (player_pos.x, player_pos.y))
     screen.blit(peanutjar, (enemy_vel, player_pos.y)), 60
     screen.blit(jelly, (enemy_vel, player_pos.y+20)), 60
+    # #collision detection
+    # if pygame.sprite.spritecollide(toasty,peanutjar, True, None):
+    #     screen.fill(PUMPKIN)
     pygame.display.flip()
     clock.tick(60)
 
