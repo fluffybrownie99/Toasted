@@ -1,4 +1,5 @@
 import pygame
+import random
 
 class Game:
     def __init__(self):
@@ -9,11 +10,13 @@ class Game:
 
         # set up the game objects
         self.player = Player(self.screen)
-        self.enemies = [Enemy(self.screen, "./assets/pjar.png", (100, 100)), 
-                        Enemy(self.screen, "./assets/jellyjar.png", (200, 100)),
-                        Enemy(self.screen, "./assets/pjar.png", (300, 100)),
-                        Enemy(self.screen, "./assets/jellyjar.png", (400, 100))
-                        ]
+        self.enemies = []
+        for i in range(2):
+            x = random.randint(0, self.screen.get_width() - 30)
+            y = random.randint(0, self.screen.get_height() // 2)
+            self.enemies.append(Enemy(self.screen, "./assets/pjar.png", (x, y)))
+            self.enemies.append(Enemy(self.screen, "./assets/jellyjar.png", (y, x)))
+
 
         # set up the clock and velocity
         self.clock = pygame.time.Clock()
@@ -58,6 +61,9 @@ class Player:
         self.image = pygame.transform.scale(self.image, (100, 100))
         self.rect = self.image.get_rect(center=(screen.get_width() / 2, screen.get_height() - 50))
         self.velocity = 10
+        self.jump_height = 20
+        self.jump_count = 0
+        self.is_jumping = False
 
     def update(self):
         # handle player movement
@@ -68,9 +74,22 @@ class Player:
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             if self.rect.right < self.screen.get_width():
                 self.rect.x += self.velocity
-        # if keys[pygame.K_UP] or keys[pygame.K_w]:
-        #     if self.rect.top > 0:
-        #         self.rect.y -= self.velocity
+        #Jumping mechanics
+        if keys[pygame.K_UP] or keys[pygame.K_w] or keys[pygame.K_SPACE]:
+            if not self.is_jumping:
+                self.is_jumping = True
+        
+        if self.is_jumping:
+            if self.jump_count >= self.jump_height:
+                self.is_jumping = False
+                self.jump_count = 0
+            else:
+                self.rect.y -= 10
+                self.jump_count += 1
+                
+        # handle gravity
+        if not self.is_jumping and self.rect.bottom < self.screen.get_height():
+            self.rect.y += 10
         # if keys[pygame.K_DOWN] or keys[pygame.K_s]:
         #     if self.rect.bottom < self.screen.get_height():
         #         self.rect.y += self.velocity
