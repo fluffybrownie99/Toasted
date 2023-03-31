@@ -11,16 +11,22 @@ class Game:
         # set up the game objects
         self.player = Player(self.screen)
         self.enemies = []
+        min_distance = 80
         #for loop for declaring random x y coordinates for enemy spawns
-        for i in range(2):
+        while len(self.enemies) < 9:
             x = random.randint(0, self.screen.get_width() - 30)
-            y = random.randint(0, self.screen.get_height() // 4)
-            x2 = random.randint(0, self.screen.get_width() - 30)
-            y2 = random.randint(0, self.screen.get_height() // 4)
-            self.enemies.append(Enemy(self.screen, "./assets/pjar.png", (x, y)))
-            self.enemies.append(Enemy(self.screen, "./assets/jellyjar.png", (x2, y2)))
+            y = random.randint(0, (self.screen.get_height() // 3)+ 10)
 
-
+            #spawn collision detection to make sure enemies do not spawn on top of each other
+            spawn_collision = False
+            for enemy in self.enemies:
+                distance = ((x - enemy.rect.centerx)**2 + (y - enemy.rect.centery)**2)**0.5
+                if distance < min_distance:
+                    spawn_collision = True
+            random_enemy_png_path = ["./assets/pjar.png", "./assets/jellyjar.png", "./assets/brian.png", "./assets/shema.png"]
+            random_enemy_type = random.choice(random_enemy_png_path)
+            if not spawn_collision:
+                self.enemies.append(Enemy(self.screen, random_enemy_type, (x, y)))
         # set up the clock and velocity
         self.clock = pygame.time.Clock()
 
@@ -39,14 +45,15 @@ class Game:
             for enemy in self.enemies:
                 enemy.update(self.enemies)
                 
-            if self.player.collides_with(enemy):
-                print(enemy)
+            collided_enemies = []
+            for enemy in self.enemies:
+                if self.player.collides_with(enemy):
+                    collided_enemies.append(enemy)
+            for enemy in collided_enemies:
                 self.enemies.remove(enemy)
-                for goon in self.enemies:
-                    goon.speed[0] -= 2
-                    goon.speed[1] -= 2
-                    goon.update(self.enemies)
+
                 if self.player.health == 1:
+                    print(self.player.health)
                     pygame.quit()
                     return
                 else:
@@ -76,6 +83,7 @@ class Player:
         self.jump_count = 0
         self.is_jumping = False
 
+
     def update(self):
         # handle player movement
         keys = pygame.key.get_pressed()
@@ -85,25 +93,7 @@ class Player:
         if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             if self.rect.right < self.screen.get_width():
                 self.rect.x += self.velocity
-        #Jumping mechanics
-        if keys[pygame.K_UP] or keys[pygame.K_w] or keys[pygame.K_SPACE]:
-            if not self.is_jumping:
-                self.is_jumping = True
-        
-        if self.is_jumping:
-            if self.jump_count >= self.jump_height:
-                self.is_jumping = False
-                self.jump_count = 0
-            else:
-                self.rect.y -= 10
-                self.jump_count += 1
-                
-        # handle gravity
-        if not self.is_jumping and self.rect.bottom < self.screen.get_height():
-            self.rect.y += 10
-        # if keys[pygame.K_DOWN] or keys[pygame.K_s]:
-        #     if self.rect.bottom < self.screen.get_height():
-        #         self.rect.y += self.velocity
+
 
     def draw(self):
         self.screen.blit(self.image, self.rect)
@@ -118,15 +108,26 @@ class Enemy:
         self.image = pygame.transform.scale(self.image, (30, 50))
         self.rect = self.image.get_rect(topleft=position)
         self.speed = [4, 4]
+        self.stuck_timer = 0
 
     def update(self, enemies):
-        for enemy in enemies:
+        on_screen_enemies = [enemy for enemy in enemies if enemy.rect.colliderect(self.screen.get_rect()) and enemy != self]
+        for enemy in on_screen_enemies:
             if enemy == self:
                 continue
             if self.rect.colliderect(enemy.rect):
                 self.speed[0] = -self.speed[0]
                 self.speed[1] = -self.speed[1]
+                self.stuck_timer += 1
                 break
+            else:
+                self.stuck_timer = 0
+            
+            if self.stuck_timer > 5*60:  # change velocity after 5 seconds of being stuck
+                self.speed[0] = random.randint(-5, 5)
+                self.speed[1] = random.randint(-5, 5)
+                self.stuck_timer = 0
+            
 
         if self.rect.left < 0 or self.rect.right > self.screen.get_width():
             self.speed[0] = -self.speed[0]
