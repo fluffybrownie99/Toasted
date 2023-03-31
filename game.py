@@ -1,5 +1,6 @@
-import pygame
-import random
+import pygame, random
+from enemy import Enemy
+from player import Player
 
 class Game:
     def __init__(self):
@@ -15,11 +16,12 @@ class Game:
         #for loop for declaring random x y coordinates for enemy spawns
         while len(self.enemies) < 9:
             x = random.randint(0, self.screen.get_width() - 30)
-            y = random.randint(0, (self.screen.get_height() // 3)+ 10)
+            y = random.randint(0, (self.screen.get_height() // 4)+ 10)
 
             #spawn collision detection to make sure enemies do not spawn on top of each other
             spawn_collision = False
             for enemy in self.enemies:
+                #distance formula
                 distance = ((x - enemy.rect.centerx)**2 + (y - enemy.rect.centery)**2)**0.5
                 if distance < min_distance:
                     spawn_collision = True
@@ -71,73 +73,6 @@ class Game:
             self.clock.tick(60)
 
 
-class Player:
-    def __init__(self, screen):
-        self.screen = screen
-        self.image = pygame.image.load("./assets/toastman.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (100, 100))
-        self.rect = self.image.get_rect(center=(screen.get_width() / 2, screen.get_height() - 50))
-        self.health = 3
-        self.velocity = 10
-        self.jump_height = 20
-        self.jump_count = 0
-        self.is_jumping = False
-
-
-    def update(self):
-        # handle player movement
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            if self.rect.left > 0:
-                self.rect.x -= self.velocity
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-            if self.rect.right < self.screen.get_width():
-                self.rect.x += self.velocity
-
-
-    def draw(self):
-        self.screen.blit(self.image, self.rect)
-
-    def collides_with(self, other):
-        return self.rect.colliderect(other.rect)
-
-class Enemy:
-    def __init__(self, screen, image_path, position):
-        self.screen = screen
-        self.image = pygame.image.load(image_path).convert_alpha()
-        self.image = pygame.transform.scale(self.image, (30, 50))
-        self.rect = self.image.get_rect(topleft=position)
-        self.speed = [4, 4]
-        self.stuck_timer = 0
-
-    def update(self, enemies):
-        on_screen_enemies = [enemy for enemy in enemies if enemy.rect.colliderect(self.screen.get_rect()) and enemy != self]
-        for enemy in on_screen_enemies:
-            if enemy == self:
-                continue
-            if self.rect.colliderect(enemy.rect):
-                self.speed[0] = -self.speed[0]
-                self.speed[1] = -self.speed[1]
-                self.stuck_timer += 1
-                break
-            else:
-                self.stuck_timer = 0
-            
-            if self.stuck_timer > 5*60:  # change velocity after 5 seconds of being stuck
-                self.speed[0] = random.randint(-5, 5)
-                self.speed[1] = random.randint(-5, 5)
-                self.stuck_timer = 0
-            
-
-        if self.rect.left < 0 or self.rect.right > self.screen.get_width():
-            self.speed[0] = -self.speed[0]
-        if self.rect.top < 0 or self.rect.bottom > self.screen.get_height():
-            self.speed[1] = -self.speed[1]
-
-        self.rect.move_ip(self.speed)
-
-    def draw(self):
-        self.screen.blit(self.image, self.rect)
 
 
 if __name__ == "__main__":
