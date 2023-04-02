@@ -12,7 +12,7 @@ class MenuScreen(pygame.Surface):
         text_rect = text.get_rect(center=(self.screen.get_width() // 2, 100))
         
         # Load the Toastman image
-        toastman_image = pygame.image.load("../assets/toastman.png").convert_alpha()
+        toastman_image = pygame.image.load("./assets/toastman.png").convert_alpha()
         
         # Get the width and height of the image
         toastman_width, toastman_height = toastman_image.get_size()

@@ -14,6 +14,7 @@ class Enemy:
         for enemy in on_screen_enemies:
             if enemy == self:
                 continue
+            #For enemies to bounce off of each other on collision
             if self.rect.colliderect(enemy.rect):
                 self.speed[0] = -self.speed[0]
                 self.speed[1] = -self.speed[1]
@@ -26,14 +27,22 @@ class Enemy:
                 self.speed[0] = random.randint(-5, 5)
                 self.speed[1] = random.randint(-5, 5)
                 self.stuck_timer = 0
-            
-
-        if self.rect.left < 0 or self.rect.right > self.screen.get_width():
-            self.speed[0] = -self.speed[0]
-        if self.rect.top < 0 or self.rect.bottom > self.screen.get_height():
-            self.speed[1] = -self.speed[1]
-
         self.rect.move_ip(self.speed)
+        
+        #Keep enemy within screen boundaries by assigning enemy rect sides to the screen boundary values if they get stuck
+        if self.rect.left < 0:
+            self.rect.left = 0 
+            self.speed[0] = -self.speed[0]
+        elif self.rect.right > self.screen.get_width():
+            self.rect.right = self.screen.get_width()
+            self.speed[0] = -self.speed[0]
+            
+        if self.rect.top < 0:
+            self.rect.top = 0
+            self.speed[1] = -self.speed[1]
+        elif self.rect.bottom > self.screen.get_height():
+            self.rect.bottom = self.screen.get_height()
+            self.speed[1] = -self.speed[1]
 
     def draw(self):
         self.screen.blit(self.image, self.rect)
