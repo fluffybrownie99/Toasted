@@ -29,7 +29,7 @@ class Game:
         self.enemies = [] #this is for clearing the list after trying the game again
         margin = 40 #this is for making sure the enemies spawn within the margins of the display
         min_distance = 80 #this is so that the enemies have a minimum distance of 80 between spawning
-        random_enemy_png_paths = ["./assets/pjar.png", "./assets/jellyjar.png", "./assets/shema.png"]
+        random_enemy_png_paths = ["./assets/pjar.png", "./assets/jellyjar.png", "./assets/shema.png", "./assets/tim.png"]
         # While loop for declaring number of enemy spawns with random coordinates for each spawn
         while len(self.enemies) < 9:
             x = random.randint(0, (self.screen.get_width() - margin))
@@ -92,7 +92,7 @@ class Game:
             for enemy in self.enemies:
                 enemy.update(self.enemies)
                 
-            # update score based on elapsded time
+            # update score based on elapsed time
             elapsed_time = pygame.time.get_ticks() - start_time
             self.score = elapsed_time // 10
             

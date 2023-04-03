@@ -2,6 +2,9 @@ import pygame
 
 class MenuScreen(pygame.Surface):
     def __init__(self, window):
+        """
+        Initializes the menu screen window
+        """
         super().__init__(window.get_size())
         self.screen = window
         self.next_screen = None
@@ -10,17 +13,13 @@ class MenuScreen(pygame.Surface):
         font = pygame.font.Font(None, 80)
         text = font.render("Toasted", True, (255, 255, 255))
         text_rect = text.get_rect(center=(self.screen.get_width() // 2, 100))
-        
         # Load the Toastman image
         toastman_image = pygame.image.load("./assets/toastman.png").convert_alpha()
-        
-        # Get the width and height of the image
+        # Get the Width and Height of the image
         toastman_width, toastman_height = toastman_image.get_size()
-        
-        # Calculate the coordinates to center the image on the screen
+        # Find the coordinates to center  image on the screen
         toastman_x = (self.get_width() - toastman_width) // 2
         toastman_y = (self.get_height() - toastman_height) // 2 - 50
-        
         play_button = pygame.Rect(self.screen.get_width() // 2 - 100, self.screen.get_height() // 2 + 50, 200, 80)
         while True:
             for event in pygame.event.get():
@@ -30,6 +29,8 @@ class MenuScreen(pygame.Surface):
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if play_button.collidepoint(pygame.mouse.get_pos()):
                         return
+                if event.type == pygame.K_SPACE:
+                    return
             # Draw the menu screen
             self.screen.fill((128, 0, 128)) #RGB Purple
             play_button_color = (139, 69, 19)  # RGB value for brown color
@@ -41,8 +42,6 @@ class MenuScreen(pygame.Surface):
             play_button = pygame.Rect(self.screen.get_width() // 2 - 100, self.screen.get_height() // 2 + 150, 200, 80)
             # Blit the Toastman image onto the screen
             self.screen.blit(toastman_image, (toastman_x, toastman_y))
-            
             # Blit the "Toasted" text onto the screen
             self.blit(text, text_rect)
-            
             pygame.display.flip()

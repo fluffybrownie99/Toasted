@@ -7,9 +7,7 @@ class Player:
         self.rect = self.image.get_rect(center=(screen.get_width() / 2, screen.get_height() - 50))
         self.health = 3
         self.velocity = 10
-        self.jump_height = 20
-        self.jump_count = 0
-        self.is_jumping = False
+
 
 
     def update(self):
