@@ -9,7 +9,7 @@ class Game:
         # Initialize pygame and create the window
         pygame.init()
         self.screen = pygame.display.set_mode((500, 700))
-        pygame.display.set_caption("Bullet Hell")
+        pygame.display.set_caption("Toasted")
         # Set up the player object
         self.player = Player(self.screen)
         # Set up the player's health with a heart image
